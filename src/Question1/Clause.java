@@ -7,6 +7,7 @@ public class Clause {
     private int lengthOfLiterals;
 
     Clause(String _data){
+        _data = _data.substring(1, _data.length() - 1);
         String literals[] = _data.split(",");
         lengthOfLiterals = literals.length;
         for (String literal : literals) {

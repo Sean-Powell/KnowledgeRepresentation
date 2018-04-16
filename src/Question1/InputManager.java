@@ -16,7 +16,7 @@ public class InputManager {
         String input;
         Clause clause;
         System.out.println("Enter the literals in the clause separated by ',' use '!' at the start of the literal" +
-                "for negation");
+                "for negation. The literal should be enclosed in []");
         while (loop) {
             System.out.println("Enter -1 to stop inputting");
             input = getInputString();
