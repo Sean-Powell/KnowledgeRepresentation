@@ -173,17 +173,7 @@ public class run {
                         }
                         endNodeName = splitInput[1];
                     }
-                    boolean endNodeExists = false;
-                    for(int i = 0; i < nodes.size(); i++){
-                        if(nodes.get(i).getName().equals(endNodeName) && !endNodeExists){
-                            endNodeExists = true;
-                        }
-                    }
 
-                    if(!endNodeExists){
-                        Node node = new Node(endNodeName);
-                        nodes.add(node);
-                    }
                     if(startName){
                         //Run program
                         System.out.println(findPaths("", startNode, endNodeName));
@@ -226,49 +216,30 @@ public class run {
         }
         return input;
     }
-
-    private static ArrayList<String> solutions = new ArrayList<>();
-    //TODO create node for end nodes that have no children.
+    //todo find a way to find the terminating nodes of the network and add the nodes for them to the node list.
+    //todo create a method where this returns an arraylist of all the posible paths
     private static String findPaths(String _currentPath, Node _nextNode, String _endNodeName){
         //TODO debug why this never completes the path
-        String newPath = _currentPath + ", " + _nextNode.getName();
+        String newPath = _currentPath;
         if(_nextNode.getName().equals(_endNodeName)){
+            newPath += _nextNode.getName() + ", ";
             return newPath;
         }else{
             for(Connection connection : _nextNode.getConnections()){
-                if(connection.getChildName().equals(_endNodeName)){
-                    //found a solution
-                    newPath += _currentPath + ",";
-                    solutions.add(newPath);
-                    return newPath;//Integer.toString(solutions.size());
-                }else{
-                    for(Node node: nodes){
-                        if(node.getName().equals(connection.getParentName())){
-                            if(connection.getPolarity()){
-                                newPath += _currentPath + node.getName() + ",";
-                                String result = findPaths(newPath, node, _endNodeName);
-                                if(!result.equals("-1")){
-                                    solutions.add(result);
-                                    return Integer.toString(solutions.size());
-                                }
+                for(Node node: nodes){
+                    if(node.getName().equals(connection.getParentName())){
+                        if(connection.getPolarity()){
+                            newPath += _nextNode.getName() + ", ";
+                           return findPaths(newPath, node, _endNodeName);
+                        }else{
+                            if(connection.getChildName().equals(_endNodeName)){
+                                newPath += _nextNode.getName() + ", ";
+                                return newPath;
                             }else{
                                 return "-1";
                             }
                         }
                     }
-                //for(Node node: nodes){
-                //    if(node.getName().equals(connection.getParentName())){
-                //        if(connection.getPolarity()){
-                //           return findPaths(newPath, node, _endNodeName);
-                //        }else{
-                //            if(connection.getChildName().equals(_endNodeName)){
-                //                newPath = _currentPath + ", " + _endNodeName;
-                //                return newPath;
-                //            }else{
-                //                return "-1";
-                //            }
-                //       }
-                //    }
                 }
             }
             return "-1";
