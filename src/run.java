@@ -1,8 +1,5 @@
-import Question1.Clause;
-import Question1.InputManager;
-import Question1.Query;
-import Question2.Connection;
-import Question2.Node;
+import Question1.*;
+import Question2.*;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -14,6 +11,7 @@ public class run {
     private static Scanner scanner = new Scanner(System.in);
     private static InputManager IM = new InputManager();
     private static Query Q = new Query();
+    private static CreatePaths CP = new CreatePaths();
 
     public static void main(String[] args) {
         boolean loop = true;
@@ -176,7 +174,10 @@ public class run {
 
                     if(startName){
                         //Run program
-                        System.out.println(findPaths("", startNode, endNodeName));
+                        ArrayList<Path> paths = CP.getPaths(nodes, startNode, endNodeName);
+                        for(Path path: paths){
+                            System.out.println(path.getNodeNames().toString());
+                        }
                     }else{
                         System.out.println("The start or end node does not exist in the network");
                     }

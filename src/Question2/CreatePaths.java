@@ -2,39 +2,64 @@ package Question2;
 
 import java.util.ArrayList;
 
-class CreatePaths{
+public class CreatePaths{
+    //using Path objects
 
-    //start at first node
-    //go along the path until a intersection is reached. First go along the top path, then return and go down the lower path
-    //continue until all connections from the node have been covered.
-    //recursion is gonna have to be used.
-    ArrayList<String> getPaths(ArrayList<Node> _nodes, ArrayList<String> _currentPaths, Node _startNode,
-                               String _endNodeName){
+    public ArrayList<Path> getPaths(ArrayList<Node> _nodes, Node _startNode, String _endNodeName){
 
-        ArrayList<Connection> connections = _startNode.getConnections();
-        Node nextNode;
+        Path path = new Path(new ArrayList<>(), _startNode, _endNodeName);
+        path.addToPath(_startNode.getName());
 
-        if(connections.size() == 1){
-            for(int i = 0; i < _currentPaths.size(); i++){
-                String newPath = _currentPaths.get(i) + ", " + connections.get(0).getChildName();
-                _currentPaths.set(i, newPath);
-                if(!connections.get(0).getChildName().equals(_endNodeName)){
-                    //end of path
-                    return _currentPaths;
+        ArrayList<Connection> connections;
+        ArrayList<Path> paths = new ArrayList<>();
+
+        Node currentNode = _startNode;
+        while(true) {
+            connections = currentNode.getConnections();
+            if (connections.size() == 0) {
+                return null; //the _end node was not down this path
+            } else if (connections.size() == 1) {
+                if(connections.get(0).getParentName().equals(_endNodeName)){
+                    path.addToPath(_endNodeName);
+                    paths.add(path);
+                    return paths;
                 }else{
                     for(Node node: _nodes){
-                        if(node.getName().equals(connections.get(0).getChildName())){
-                            nextNode = node;
-                            getPaths(_nodes, _currentPaths, nextNode, _endNodeName);
+                        if(node.getName().equals(connections.get(0).getParentName())){
+                            path.addToPath(connections.get(0).getParentName());
+                            currentNode = node;
+                            break;
                         }
                     }
                 }
-            }
-        }else{
-            for(Connection connection: connections){
-                //if there is two paths in the list already and there are two connections at the end of this there are
-                //going to have to be 4 paths. This is going to have to recursively find each of the new paths.
+            }else{
+                for(Connection connection: connections){
+                    Path tempPath = path;
+                    if(connection.getParentName().equals(_endNodeName)){
+                        tempPath.addToPath(_endNodeName);
+                        paths.add(tempPath);
+                    }else{
+                        ArrayList<Path> tempList = new ArrayList<>();
+                        for(Node node: _nodes){
+                            if(node.getName().equals(connection.getParentName())){
+                                tempList = getPaths(_nodes, node, _endNodeName);
+                                break;
+                            }
+                        }
+
+                        for(Path pathTemp: tempList){
+                            for(String string: pathTemp.getNodeNames()){
+                                tempPath.addToPath(string);
+                            }
+                            paths.add(tempPath);
+                            tempPath = path;
+                        }
+                    }
+                }
+                return paths;
             }
         }
     }
 }
+
+
