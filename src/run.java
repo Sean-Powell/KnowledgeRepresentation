@@ -161,8 +161,14 @@ public class run {
                 case 2:
                     System.out.println("Input the start and end point in the Start TO End format please");
                     input = getStringInput();
-                    if(input != null && input.contains("TO")){
-                        splitInput = input.split(" TO ");
+                    boolean isNot = false;
+                    if(input != null && (input.contains(" IS-A ") || input.contains(" IS-NOT-A "))){
+                        if(input.contains(" IS-NOT-A ")){
+                            splitInput = input.split(" IS-NOT-A ");
+                            isNot = true;
+                        }else{
+                            splitInput = input.split(" IS-A ");
+                        }
                         for(Node node: nodes){
                             if(!startName && node.getName().equals(splitInput[0])) {
                                 startName = true;
@@ -175,15 +181,40 @@ public class run {
                     if(startName){
                         //Run program
                         ArrayList<Path> paths = CP.getPaths(nodes, startNode, endNodeName);
-                        for(Path path: paths){
-                            System.out.println(path.getNodeNames().toString());
+                        if(isNot && paths.size() <= 0){
+                            System.out.println(startNode.getName() + " is not a child of " + endNodeName);
                         }
+                        for(int i = 0; i < paths.size(); i++){
+                            for(String string: paths.get(i).getNodeNames()){
+                                if(string.equals("null")){
+                                    System.out.println("Removing path");
+                                    paths.remove(i);
+                                }
+                            }
+                        }
+
+                        int lowestDistance = Integer.MAX_VALUE;
+                        int lowestDistanceIndex = -1;
+
+                        System.out.println("Paths:");
+                        for (int i = 0; i < paths.size(); i++) {
+                            if(paths.get(i).getLength() < lowestDistance){
+                                System.out.println(paths.get(i).getNodeNames().toString());
+                                lowestDistance = paths.get(i).getLength();
+                                lowestDistanceIndex = i;
+                            }
+                        }
+                        System.out.println("Shortest Path:");
+                        System.out.println(paths.get(lowestDistanceIndex).getNodeNames().toString());
+
+                        //todo work out inferential distance.
+                        paths = checkIfRedundant(paths);
+
+
+
                     }else{
                         System.out.println("The start or end node does not exist in the network");
                     }
-                    break;
-                case 3:
-                    //build knowledge network.
                     break;
                 case -1:
                     loop = false;
@@ -205,6 +236,39 @@ public class run {
         }
     }
 
+    private static ArrayList<Path> checkIfRedundant(ArrayList<Path> _listOfPaths){
+        for(int i = 0; i < _listOfPaths.size(); i++){
+            ArrayList<String> nodeName = _listOfPaths.get(i).getNodeNames();
+            for(int j = 0; j < nodeName.size() - 1; j++){
+                String childName = nodeName.get(j);
+                String parentName = nodeName.get(j + 1);
+                for(Path path1: _listOfPaths){
+                    if(path1 != _listOfPaths.get(i)){
+                        int childNameIndex = -1;
+                        int parentNameIndex = -1;
+                        ArrayList<String> nodeNamesPath2 = path1.getNodeNames();
+                        for(int k = 0; k < nodeNamesPath2.size(); k++){
+                            if(nodeNamesPath2.get(k).equals(childName)){
+                                childNameIndex = k;
+                            }else if(nodeNamesPath2.get(k).equals(parentName)){
+                                parentNameIndex = k;
+                            }
+                        }
+
+                        if(parentNameIndex - childNameIndex > 1 && childNameIndex != -1 && parentNameIndex != -1){
+                            //path is redundant
+                            System.out.println("Deleting path as redundant: " + _listOfPaths.get(i).getNodeNames().toString());
+                            _listOfPaths.remove(i);
+                            j = nodeName.size() + 1;
+                        }
+                    }
+                }
+            }
+        }
+
+        return _listOfPaths;
+    }
+
 
     private static int getInt(){
         int input;
@@ -216,34 +280,5 @@ public class run {
             input = -2;
         }
         return input;
-    }
-    //todo find a way to find the terminating nodes of the network and add the nodes for them to the node list.
-    //todo create a method where this returns an arraylist of all the posible paths
-    private static String findPaths(String _currentPath, Node _nextNode, String _endNodeName){
-        //TODO debug why this never completes the path
-        String newPath = _currentPath;
-        if(_nextNode.getName().equals(_endNodeName)){
-            newPath += _nextNode.getName() + ", ";
-            return newPath;
-        }else{
-            for(Connection connection : _nextNode.getConnections()){
-                for(Node node: nodes){
-                    if(node.getName().equals(connection.getParentName())){
-                        if(connection.getPolarity()){
-                            newPath += _nextNode.getName() + ", ";
-                           return findPaths(newPath, node, _endNodeName);
-                        }else{
-                            if(connection.getChildName().equals(_endNodeName)){
-                                newPath += _nextNode.getName() + ", ";
-                                return newPath;
-                            }else{
-                                return "-1";
-                            }
-                        }
-                    }
-                }
-            }
-            return "-1";
-        }
     }
 }
