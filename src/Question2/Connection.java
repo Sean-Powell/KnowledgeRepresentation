@@ -11,15 +11,15 @@ public class Connection {
         polarity = _polarity;
     }
 
-    public String getParentName() {
+    String getParentName() {
         return parentName;
     }
 
-    public String getChildName() {
+    String getChildName() {
         return childName;
     }
 
-    public boolean getPolarity(){
+    boolean getPolarity(){
         return polarity;
     }
 }

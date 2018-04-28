@@ -18,7 +18,7 @@ public class Node {
         connections.add(_connection);
     }
 
-    public ArrayList<Connection> getConnections() {
+    ArrayList<Connection> getConnections() {
         return connections;
     }
 }

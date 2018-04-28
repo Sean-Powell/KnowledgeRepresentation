@@ -25,7 +25,7 @@ public class Clause {
         return listOfLiterals;
     }
 
-    public int getLengthOfLiterals() {
+    int getLengthOfLiterals() {
         return lengthOfLiterals;
     }
 }

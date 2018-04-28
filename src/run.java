@@ -4,6 +4,7 @@ import Question2.*;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
@@ -37,7 +38,6 @@ public class run {
                         break;
                 }
             }catch(Exception e){
-                e.printStackTrace();
                 scanner = null;
                 scanner = new Scanner(System.in);
             }
@@ -182,37 +182,48 @@ public class run {
                     if(startName){
                         //Run program
                         ArrayList<Path> paths = CP.getPaths(nodes, startNode, endNodeName);
-                        if(isNot && paths.size() <= 0){
+                        if(isNot && paths == null){
                             System.out.println(startNode.getName() + " is not a child of " + endNodeName);
-                        }
-                        for(int i = 0; i < paths.size(); i++){
-                            for(String string: paths.get(i).getNodeNames()){
-                                if(string.equals("null")){
-                                    System.out.println("Removing path");
-                                    paths.remove(i);
+                        }else {
+                            if(paths.size() > 0){
+                                for (int i = 0; i < paths.size(); i++) {
+                                    for (String string : paths.get(i).getNodeNames()) {
+                                        if (string.equals("null")) {
+                                            System.out.println("Removing path");
+                                            paths.remove(i);
+                                        }
+                                    }
                                 }
+                                System.out.println("-----------------------");
+                                int lowestDistance = Integer.MAX_VALUE;
+                                ArrayList<Path> shortestPath = new ArrayList<>();
+                                System.out.println("Paths:");
+                                for (Path path : paths) {
+                                    if (path.getLength() < lowestDistance) {
+                                        System.out.println(path.getNodeNames().toString());
+                                        lowestDistance = path.getLength();
+                                        shortestPath.clear();
+                                        shortestPath.add(path);
+                                    } else if (path.getLength() == lowestDistance) {
+                                        shortestPath.add(path);
+                                    }
+                                }
+                                System.out.println("-----------------------");
+                                paths = CP.checkIfRedundant(paths);
+                                paths = CP.checkForPreemption(paths);
+                                System.out.println("-----------------------");
+                                System.out.println("Shortest path: ");
+                                for(Path path: shortestPath){
+                                    System.out.println(path.getNodeNames().toString());
+                                }
+                                System.out.println("Inferential Distance:");
+                                for (Path path : paths) {
+                                    System.out.println(path.getNodeNames().toString());
+                                }
+                                System.out.println("-----------------------");
+                            }else {
+                                System.out.println("There is no valid path from " + startNode.getName() + " to " + endNodeName);
                             }
-                        }
-
-                        int lowestDistance = Integer.MAX_VALUE;
-                        int lowestDistanceIndex = -1;
-
-                        System.out.println("Paths:");
-                        for (int i = 0; i < paths.size(); i++) {
-                            if(paths.get(i).getLength() < lowestDistance){
-                                System.out.println(paths.get(i).getNodeNames().toString());
-                                lowestDistance = paths.get(i).getLength();
-                                lowestDistanceIndex = i;
-                            }
-                        }
-                        System.out.println("Shortest Path:");
-                        System.out.println(paths.get(lowestDistanceIndex).getNodeNames().toString());
-
-                        paths = checkIfRedundant(paths);
-                        paths = checkForPreemption(paths);
-
-                        for (Path path : paths) {
-                            System.out.println("Inferential Distance: " + path.getNodeNames().toString());
                         }
 
                     }else{
@@ -238,76 +249,6 @@ public class run {
             return null;
         }
     }
-
-    private static ArrayList<Path> checkIfRedundant(ArrayList<Path> _listOfPaths){
-        for(int i = 0; i < _listOfPaths.size(); i++){
-            ArrayList<String> nodeName = _listOfPaths.get(i).getNodeNames();
-            for(int j = 0; j < nodeName.size() - 1; j++){
-                String childName = nodeName.get(j);
-                String parentName = nodeName.get(j + 1);
-                for(Path path1: _listOfPaths){
-                    if(path1 != _listOfPaths.get(i)){
-                        int childNameIndex = -1;
-                        int parentNameIndex = -1;
-                        ArrayList<String> nodeNamesPath2 = path1.getNodeNames();
-                        for(int k = 0; k < nodeNamesPath2.size(); k++){
-                            if(nodeNamesPath2.get(k).equals(childName)){
-                                childNameIndex = k;
-                            }else if(nodeNamesPath2.get(k).equals(parentName)){
-                                parentNameIndex = k;
-                            }
-                        }
-
-                        if(parentNameIndex - childNameIndex > 1 && childNameIndex != -1 && parentNameIndex != -1){
-                            //path is redundant
-                            System.out.println("Deleting path as redundant: " + _listOfPaths.get(i).getNodeNames().toString());
-                            _listOfPaths.remove(i);
-                            j = nodeName.size();
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-
-        return _listOfPaths;
-    }
-
-    private static ArrayList<Path> checkForPreemption(ArrayList<Path> _listOfPaths){
-        for (int i = 0; i < _listOfPaths.size(); i++) {
-            ArrayList<String> nodeNames = _listOfPaths.get(i).getNodeNames();
-            String beforeEndName = nodeNames.get(nodeNames.size() - 2);
-            String endNodeName = nodeNames.get(nodeNames.size() - 1);
-
-            for(int j = 0; j < _listOfPaths.size(); j++){
-                if(j != i){
-                    int beforeEndNameIndex = -1;
-                    for(int k = 0; k < _listOfPaths.get(j).getNodeNames().size(); k++){
-                        if(beforeEndName.equals(_listOfPaths.get(j).getNodeNames().get(k))){
-                            beforeEndNameIndex = k;
-                            k = _listOfPaths.get(j).getNodeNames().size() + 1;
-                        }
-                    }
-
-                    if(beforeEndNameIndex != -1){
-                        if(_listOfPaths.get(i).getNodeNames().size() - beforeEndNameIndex > 1){
-                            //check if polarity is different.
-                            String subPathEndNodeName = _listOfPaths.get(j).getNodeNames().get(_listOfPaths.get(j).getNodeNames().size() - 1);
-                            if(!endNodeName.equals(subPathEndNodeName)){
-                                //path is preempted
-                                System.out.println("Path is preempted: " + _listOfPaths.get(j).getNodeNames().toString());
-                                _listOfPaths.remove(j);
-                                j = _listOfPaths.size();
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        return _listOfPaths;
-    }
-
 
     private static int getInt(){
         int input;
