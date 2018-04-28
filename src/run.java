@@ -37,6 +37,7 @@ public class run {
                         break;
                 }
             }catch(Exception e){
+                e.printStackTrace();
                 scanner = null;
                 scanner = new Scanner(System.in);
             }
@@ -207,10 +208,12 @@ public class run {
                         System.out.println("Shortest Path:");
                         System.out.println(paths.get(lowestDistanceIndex).getNodeNames().toString());
 
-                        //todo work out inferential distance.
                         paths = checkIfRedundant(paths);
+                        paths = checkForPreemption(paths);
 
-
+                        for (Path path : paths) {
+                            System.out.println("Inferential Distance: " + path.getNodeNames().toString());
+                        }
 
                     }else{
                         System.out.println("The start or end node does not exist in the network");
@@ -259,7 +262,43 @@ public class run {
                             //path is redundant
                             System.out.println("Deleting path as redundant: " + _listOfPaths.get(i).getNodeNames().toString());
                             _listOfPaths.remove(i);
-                            j = nodeName.size() + 1;
+                            j = nodeName.size();
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        return _listOfPaths;
+    }
+
+    private static ArrayList<Path> checkForPreemption(ArrayList<Path> _listOfPaths){
+        for (int i = 0; i < _listOfPaths.size(); i++) {
+            ArrayList<String> nodeNames = _listOfPaths.get(i).getNodeNames();
+            String beforeEndName = nodeNames.get(nodeNames.size() - 2);
+            String endNodeName = nodeNames.get(nodeNames.size() - 1);
+
+            for(int j = 0; j < _listOfPaths.size(); j++){
+                if(j != i){
+                    int beforeEndNameIndex = -1;
+                    for(int k = 0; k < _listOfPaths.get(j).getNodeNames().size(); k++){
+                        if(beforeEndName.equals(_listOfPaths.get(j).getNodeNames().get(k))){
+                            beforeEndNameIndex = k;
+                            k = _listOfPaths.get(j).getNodeNames().size() + 1;
+                        }
+                    }
+
+                    if(beforeEndNameIndex != -1){
+                        if(_listOfPaths.get(i).getNodeNames().size() - beforeEndNameIndex > 1){
+                            //check if polarity is different.
+                            String subPathEndNodeName = _listOfPaths.get(j).getNodeNames().get(_listOfPaths.get(j).getNodeNames().size() - 1);
+                            if(!endNodeName.equals(subPathEndNodeName)){
+                                //path is preempted
+                                System.out.println("Path is preempted: " + _listOfPaths.get(j).getNodeNames().toString());
+                                _listOfPaths.remove(j);
+                                j = _listOfPaths.size();
+                            }
                         }
                     }
                 }
