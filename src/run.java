@@ -197,16 +197,16 @@ public class run {
                                 }
                                 System.out.println("-----------------------");
                                 int lowestDistance = Integer.MAX_VALUE;
-                                ArrayList<Path> shortestPath = new ArrayList<>();
+                                ArrayList<Path> shortestPaths = new ArrayList<>();
                                 System.out.println("Paths:");
                                 for (Path path : paths) {
+                                    System.out.println(path.getNodeNames().toString());
                                     if (path.getLength() < lowestDistance) {
-                                        System.out.println(path.getNodeNames().toString());
                                         lowestDistance = path.getLength();
-                                        shortestPath.clear();
-                                        shortestPath.add(path);
+                                        shortestPaths.clear();
+                                        shortestPaths.add(path);
                                     } else if (path.getLength() == lowestDistance) {
-                                        shortestPath.add(path);
+                                        shortestPaths.add(path);
                                     }
                                 }
                                 System.out.println("-----------------------");
@@ -214,7 +214,7 @@ public class run {
                                 paths = CP.checkForPreemption(paths);
                                 System.out.println("-----------------------");
                                 System.out.println("Shortest path: ");
-                                for(Path path: shortestPath){
+                                for(Path path: shortestPaths){
                                     System.out.println(path.getNodeNames().toString());
                                 }
                                 System.out.println("Inferential Distance:");
@@ -228,7 +228,7 @@ public class run {
                         }
 
                     }else{
-                        System.out.println("The start does not exist in the network");
+                        System.out.println("The start node does not exist in the network");
                     }
                     break;
                 case -1:

@@ -18,7 +18,7 @@ public class Path {
         return length;
     }
 
-    public void addToPath(String _nodeName){
+    void addToPath(String _nodeName){
         nodeNames.add(_nodeName);
         length++;
     }
