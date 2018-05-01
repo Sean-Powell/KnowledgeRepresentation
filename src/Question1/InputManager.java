@@ -9,7 +9,7 @@ public class InputManager {
     // for the String input
     private BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
     private ArrayList<Clause> knowledgeBase = new ArrayList<>();
-    private Literal query;
+    private Literal query = null;
 
     public ArrayList<Clause> createKnowledgeBase() {
         boolean loop = true;

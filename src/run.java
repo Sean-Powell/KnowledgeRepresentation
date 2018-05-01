@@ -4,7 +4,6 @@ import Question2.*;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
@@ -88,10 +87,12 @@ public class run {
                     IM.setQuery();
                     break;
                 case 5:
-                    if(Q.runQuery(knowledgeBase, IM.getQuery())){
-                        System.out.println("SOLVED");
-                    }else{
-                        System.out.println("NOT SOLVED");
+                    if(IM.getQuery() != null) {
+                        if (Q.runQuery(knowledgeBase, IM.getQuery())) {
+                            System.out.println("SOLVED");
+                        } else {
+                            System.out.println("NOT SOLVED");
+                        }
                     }
                     break;
                 case -1:
