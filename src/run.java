@@ -111,7 +111,7 @@ public class run {
         boolean loop = true;
         boolean polarity;
         boolean connectionFound = false;
-        boolean startName = false;
+        boolean startNodeFound = false;
 
         String input;
         String splitInput[];
@@ -161,7 +161,7 @@ public class run {
                     }
                     break;
                 case 2:
-                    System.out.println("Input the start and end point in the Start TO End format please");
+                    System.out.println("Input the start and end points in the Start IS-A/IS-NOT-A End format please");
                     input = getStringInput();
                     boolean isNot = false;
                     if(input != null && (input.contains(" IS-A ") || input.contains(" IS-NOT-A "))){
@@ -172,15 +172,15 @@ public class run {
                             splitInput = input.split(" IS-A ");
                         }
                         for(Node node: nodes){
-                            if(!startName && node.getName().equals(splitInput[0])) {
-                                startName = true;
+                            if(!startNodeFound && node.getName().equals(splitInput[0])) {
+                                startNodeFound = true;
                                 startNode = node;
                             }
                         }
                         endNodeName = splitInput[1];
                     }
 
-                    if(startName){
+                    if(startNodeFound){
                         //Run program
                         ArrayList<Path> paths = CP.getPaths(nodes, startNode, endNodeName);
                         if(isNot && paths == null){
@@ -228,7 +228,7 @@ public class run {
                         }
 
                     }else{
-                        System.out.println("The start or end node does not exist in the network");
+                        System.out.println("The start does not exist in the network");
                     }
                     break;
                 case -1:
