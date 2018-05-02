@@ -151,7 +151,6 @@ public class CreatePaths {
 
                     if(beforeEndNameIndex != -1){
                         if(_listOfPaths.get(i).getNodeNames().size() - beforeEndNameIndex > 1){
-                            //check if polarity is different.
                             String subPathEndNodeName = _listOfPaths.get(j).getNodeNames().get(_listOfPaths.get(j).getNodeNames().size() - 1);
                             if(!endNodeName.equals(subPathEndNodeName)){
                                 //path is preempted
